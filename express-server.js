@@ -43,6 +43,14 @@ app.post("/urls/:id/delete", (req, res) => {
   }
   res.redirect("/urls");
 });
+app.post("/urls/:id", (req, res) => {
+  const { id } = req.params;
+  const { newUrl } = req.body;
+  if (urlDatabase[id]) {
+    urlDatabase[id] = newUrl;
+  }
+  res.redirect("/urls");
+});
 
 app.get("/u/:id", (req, res) => {
   const { id } = req.params;
