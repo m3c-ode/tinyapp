@@ -24,6 +24,14 @@ app.get("/urls", (req, res) => {
   // res.json(urlDatabase);
 });
 
+app.get("/urls/:id", (req, res) => {
+  // console.log('req.params', req.params);
+  const { id } = req.params;
+  res.render("urls-show", { id, longURL: urlDatabase[id] });
+  // res.json(urlDatabase);
+  // res.send(req.params);
+});
+
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
