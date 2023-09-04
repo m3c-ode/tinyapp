@@ -19,8 +19,9 @@ app.get("/", (req, res) => {
   res.send("Welcome");
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+app.get("/urls", (req, res) => {
+  res.render("urls-index", { urls: urlDatabase });
+  // res.json(urlDatabase);
 });
 
 app.get("/hello", (req, res) => {
