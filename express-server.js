@@ -4,7 +4,7 @@ const PORT = 8080;
 
 // middleware
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 
 app.set('view engine', 'ejs');
 
@@ -24,6 +24,10 @@ app.get("/urls", (req, res) => {
   // res.json(urlDatabase);
 });
 
+app.get("/urls/new", (req, res) => {
+  res.render("urls-new");
+});
+
 app.get("/urls/:id", (req, res) => {
   // console.log('req.params', req.params);
   const { id } = req.params;
@@ -32,6 +36,17 @@ app.get("/urls/:id", (req, res) => {
   // res.send(req.params);
 });
 
+app.post("/urls", (req, res) => {
+  console.log("req.body", req.body);
+  // urlDatabase
+  let newId = generateRandomString();
+  console.log("🚀 ~ file: express-server.js:43 ~ app.post ~ newId:", newId);
+  let { longURL } = req.body;
+  urlDatabase[newId] = longURL;
+  res.redirect("/urls");
+});
+
+
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
@@ -39,3 +54,13 @@ app.get("/hello", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
+
+const generateRandomString = function() {
+  let newId = '';
+  const set = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (let index = 0; index < 6; index++) {
+    let randomIndex = Math.floor(Math.random() * set.length);
+    newId += set[randomIndex];
+  }
+  return newId;
+};
