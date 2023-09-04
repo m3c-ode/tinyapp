@@ -36,6 +36,11 @@ app.get("/urls/:id", (req, res) => {
   // res.send(req.params);
 });
 
+app.get("/u/:id", (req, res) => {
+  const { id } = req.params;
+  res.redirect(urlDatabase[id]);
+});
+
 app.post("/urls", (req, res) => {
   console.log("req.body", req.body);
   // urlDatabase
@@ -43,7 +48,7 @@ app.post("/urls", (req, res) => {
   console.log("🚀 ~ file: express-server.js:43 ~ app.post ~ newId:", newId);
   let { longURL } = req.body;
   urlDatabase[newId] = longURL;
-  res.redirect("/urls");
+  res.redirect(`/urls/:${newId}`);
 });
 
 
