@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/m3c-ode/tinyapp/issues"
   },
-  "homepage": "https://github.com/m3c-ode/tinyapp#readme"
+  "homepage": "https://github.com/m3c-ode/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
