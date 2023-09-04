@@ -36,6 +36,14 @@ app.get("/urls/:id", (req, res) => {
   // res.send(req.params);
 });
 
+app.post("/urls/:id/delete", (req, res) => {
+  const { id } = req.params;
+  if (urlDatabase[id]) {
+    delete urlDatabase[id];
+  }
+  res.redirect("/urls");
+});
+
 app.get("/u/:id", (req, res) => {
   const { id } = req.params;
   res.redirect(urlDatabase[id]);
