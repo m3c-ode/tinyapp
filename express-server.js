@@ -46,7 +46,6 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  // const username = req.cookies["username"];
   const userId = req.cookies["user_id"];
   res.render("urls-new", { user: users[userId], pageTitle: "TinyApp - New URL" });
 });
@@ -59,7 +58,6 @@ app.get("/urls/:id", (req, res) => {
     id,
     pageTitle: "TinyApp - Details",
     longURL: urlDatabase[id],
-    // username: req.cookies["username"],
     user: users[userId]
   };
   res.render("urls-show", templateVars);
@@ -133,7 +131,7 @@ app.post("/login", (req, res) => {
   const { email, password } = req.body;
   const user = findUser(email, password);
   if (!user) {
-    res.sendStatus(400);
+    res.sendStatus(403);
   }
   res.cookie("user_id", user.id);
   res.redirect("/urls");
@@ -141,7 +139,7 @@ app.post("/login", (req, res) => {
 
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 app.get("/hello", (req, res) => {
