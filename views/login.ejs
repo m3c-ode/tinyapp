@@ -1,0 +1,19 @@
+<%- include('partials/_head') %>
+
+<body>
+  <%- include('partials/_header') %>
+  <form action="/login" method="post" autocomplete="off">
+    <!-- <div> -->
+    <label for="email">Email: </label>
+    <input autocomplete="off" type="email" name="email" id="email">
+    <!-- </div> -->
+    <!-- <div> -->
+    <label for="password">Password: </label>
+    <input autocomplete="off" type="password" name="password" id="password">
+    <!-- </div> -->
+    <button class="btn btn-primary" type="submit">Login</button>
+  </form>
+  <%- include('partials/_bootstrap-scripts') %>
+</body>
+
+</html>

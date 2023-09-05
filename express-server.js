@@ -26,6 +26,11 @@ const users = {
     email: "user2@example.com",
     password: "dishwasher-funk",
   },
+  test: {
+    id: "test",
+    email: "test@test.ca",
+    password: "test",
+  },
 };
 
 
@@ -120,10 +125,17 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
+app.get("/login", (req, res) => {
+  res.render("login", { pageTitle: "TinyApp - Login", user: undefined });
+});
 
 app.post("/login", (req, res) => {
-  const { username } = req.body;
-  res.cookie("username", username);
+  const { email, password } = req.body;
+  const user = findUser(email, password);
+  if (!user) {
+    res.sendStatus(400);
+  }
+  res.cookie("user_id", user.id);
   res.redirect("/urls");
 });
 
@@ -151,11 +163,11 @@ const generateRandomString = function() {
 };
 
 // looks up if user already exists in our data
-const findUser = function(email) {
+const findUser = function(email, password) {
   for (const user in users) {
     if (Object.hasOwnProperty.call(users, user)) {
       const userObj = users[user];
-      if (userObj[email]) {
+      if (userObj.email === email && userObj.password === password) {
         return userObj;
       }
     }
