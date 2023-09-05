@@ -35,24 +35,27 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const username = req.cookies["username"];
-  res.render("urls-index", { pageTitle: "TinyApp - URLs", urls: urlDatabase, username });
+  const userId = req.cookies["user_id"];
+  res.render("urls-index", { pageTitle: "TinyApp - URLs", urls: urlDatabase, user: users[userId] });
   // res.json(urlDatabase);
 });
 
 app.get("/urls/new", (req, res) => {
-  const username = req.cookies["username"];
-  res.render("urls-new", { username, pageTitle: "TinyApp - New URL" });
+  // const username = req.cookies["username"];
+  const userId = req.cookies["user_id"];
+  res.render("urls-new", { user: users[userId], pageTitle: "TinyApp - New URL" });
 });
 
 app.get("/urls/:id", (req, res) => {
   // console.log('req.params', req.params);
   const { id } = req.params;
+  const userId = req.cookies["user_id"];
   const templateVars = {
     id,
     pageTitle: "TinyApp - Details",
     longURL: urlDatabase[id],
-    username: req.cookies["username"]
+    // username: req.cookies["username"],
+    user: users[userId]
   };
   res.render("urls-show", templateVars);
   // res.json(urlDatabase);
@@ -91,12 +94,20 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  res.render("registration", { pageTitle: "TinyApp - Register", username: undefined });
+  res.render("registration", { pageTitle: "TinyApp - Register", user: undefined });
 });
 
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    res.sendStatus(400).send("Bad request - Incomplete form");
+    // res.send("Form was not complete");
+  }
+  console.log("🚀 ~ file: express-server.js:108 ~ app.post ~ doesExist(email):", doesExist(email));
+  if (doesExist(email)) {
+    res.status(400).send("Bad Request - User already exists");
+  }
   const newUserId = generateRandomString();
   users[newUserId] = {
     id: newUserId,
@@ -117,7 +128,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
@@ -137,4 +148,31 @@ const generateRandomString = function() {
     newId += set[randomIndex];
   }
   return newId;
+};
+
+// looks up if user already exists in our data
+const findUser = function(email) {
+  for (const user in users) {
+    if (Object.hasOwnProperty.call(users, user)) {
+      const userObj = users[user];
+      if (userObj[email]) {
+        return userObj;
+      }
+    }
+  }
+  return null;
+};
+// looks up if user already exists in our data
+const doesExist = function(email) {
+  for (const user in users) {
+    console.log("🚀 ~ file: express-server.js:168 ~ doesExist ~ user:", user);
+    if (Object.hasOwnProperty.call(users, user)) {
+      const userObj = users[user];
+      console.log("🚀 ~ file: express-server.js:171 ~ doesExist ~ userObj:", userObj);
+      if (userObj.email === email) {
+        return true;
+      }
+    }
+  }
+  return false;
 };
