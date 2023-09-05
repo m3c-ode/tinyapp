@@ -47,6 +47,9 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const userId = req.cookies["user_id"];
+  if (!userId) {
+    res.redirect("/login");
+  }
   res.render("urls-new", { user: users[userId], pageTitle: "TinyApp - New URL" });
 });
 
@@ -66,6 +69,12 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
+  const userId = req.cookies["user_id"];
+  if (!userId) {
+    // Unauthorized
+    // res.send("Only logged in users can delete URLs");
+    res.sendStatus(401);
+  }
   const { id } = req.params;
   if (urlDatabase[id]) {
     delete urlDatabase[id];
@@ -73,6 +82,12 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect("/urls");
 });
 app.post("/urls/:id", (req, res) => {
+  const userId = req.cookies["user_id"];
+  if (!userId) {
+    // Unauthorized
+    // res.send("Only logged in users can edit URLs");
+    res.sendStatus(401);
+  }
   const { id } = req.params;
   const { newUrl } = req.body;
   if (urlDatabase[id]) {
@@ -83,11 +98,22 @@ app.post("/urls/:id", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
   const { id } = req.params;
+  if (!urlDatabase[id]) {
+    // Not found
+    res.send("Can not access. This URL does not exist");
+    res.sendStatus(404);
+  }
   res.redirect(urlDatabase[id]);
 });
 
 app.post("/urls", (req, res) => {
-  console.log("req.body", req.body);
+  const userId = req.cookies["user_id"];
+  if (!userId) {
+    // Unauthorized
+    // res.send("Only logged in users can create new URLs");
+    res.sendStatus(401);
+    // res.redirect("/login");
+  }
   // urlDatabase
   let newId = generateRandomString();
   console.log("🚀 ~ file: express-server.js:43 ~ app.post ~ newId:", newId);
