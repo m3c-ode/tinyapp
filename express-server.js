@@ -97,6 +97,10 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
+  const userId = req.cookies["user_id"];
+  if (userId) {
+    res.redirect("/urls");
+  }
   res.render("registration", { pageTitle: "TinyApp - Register", user: undefined });
 });
 
@@ -124,6 +128,10 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
+  const userId = req.cookies["user_id"];
+  if (userId) {
+    res.redirect("/urls");
+  }
   res.render("login", { pageTitle: "TinyApp - Login", user: undefined });
 });
 
