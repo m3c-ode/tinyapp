@@ -77,6 +77,19 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/:${newId}`);
 });
 
+app.get("/register", (req, res) => {
+  res.render("registration", { pageTitle: "TinyApp - Register", username: undefined });
+});
+
+app.post("/register", (req, res) => {
+  const { email, password } = req.body;
+  console.log("🚀 ~ file: express-server.js:86 ~ app.post ~ email, password:", email, password);
+  // Operation
+
+  res.redirect("/urls");
+});
+
+
 app.post("/login", (req, res) => {
   const { username } = req.body;
   res.cookie("username", username);
