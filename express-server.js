@@ -23,13 +23,13 @@ app.get("/", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const username = req.cookies["username"];
-  res.render("urls-index", { urls: urlDatabase, username });
+  res.render("urls-index", { pageTitle: "TinyApp - URLs", urls: urlDatabase, username });
   // res.json(urlDatabase);
 });
 
 app.get("/urls/new", (req, res) => {
   const username = req.cookies["username"];
-  res.render("urls-new", { username });
+  res.render("urls-new", { username, pageTitle: "TinyApp - New URL" });
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -37,6 +37,7 @@ app.get("/urls/:id", (req, res) => {
   const { id } = req.params;
   const templateVars = {
     id,
+    pageTitle: "TinyApp - Details",
     longURL: urlDatabase[id],
     username: req.cookies["username"]
   };
@@ -83,7 +84,6 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  // delete req.cookies;
   res.clearCookie("username");
   res.redirect("/urls");
 });
