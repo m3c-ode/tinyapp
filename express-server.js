@@ -15,6 +15,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 
 
 app.get("/", (req, res) => {
@@ -83,9 +96,16 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
   const { email, password } = req.body;
-  console.log("🚀 ~ file: express-server.js:86 ~ app.post ~ email, password:", email, password);
-  // Operation
 
+  const newUserId = generateRandomString();
+  users[newUserId] = {
+    id: newUserId,
+    email,
+    password
+  };
+
+  res.cookie("user_id", newUserId);
+  console.log('users list', users);
   res.redirect("/urls");
 });
 
