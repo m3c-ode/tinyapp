@@ -1,10 +1,12 @@
 const express = require('express');
+const cookieParser = require("cookie-parser");
 const app = express();
 const PORT = 8080;
 
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.set('view engine', 'ejs');
 
@@ -20,18 +22,25 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  res.render("urls-index", { urls: urlDatabase });
+  const username = req.cookies["username"];
+  res.render("urls-index", { urls: urlDatabase, username });
   // res.json(urlDatabase);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls-new");
+  const username = req.cookies["username"];
+  res.render("urls-new", { username });
 });
 
 app.get("/urls/:id", (req, res) => {
   // console.log('req.params', req.params);
   const { id } = req.params;
-  res.render("urls-show", { id, longURL: urlDatabase[id] });
+  const templateVars = {
+    id,
+    longURL: urlDatabase[id],
+    username: req.cookies["username"]
+  };
+  res.render("urls-show", templateVars);
   // res.json(urlDatabase);
   // res.send(req.params);
 });
@@ -70,6 +79,12 @@ app.post("/urls", (req, res) => {
 app.post("/login", (req, res) => {
   const { username } = req.body;
   res.cookie("username", username);
+  res.redirect("/urls");
+});
+
+app.post("/logout", (req, res) => {
+  // delete req.cookies;
+  res.clearCookie("username");
   res.redirect("/urls");
 });
 
