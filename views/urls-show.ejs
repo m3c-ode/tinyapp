@@ -5,7 +5,7 @@
   <div class="card text-center">
     <div class="card-header"></div>
     <div class="card-body">
-      <h5 class="card-title">TinyURL for: <%= longURL %></h5>
+      <h5 class="card-title">TinyURL for: <%= longUrl %></h5>
       <p class="card-text">
         Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
       </p>
@@ -14,7 +14,7 @@
       <h4>Edit</h4>
       <form action="/urls/<%= id %>" method="post">
         <label for="newUrl">New URL: </label>
-        <input type="text" name="newUrl" id="" placeholder="<%= longURL %>">
+        <input type="text" name="newUrl" id="" placeholder="<%= longUrl %>">
         <button class="btn btn-primary" type="submit">Submit</button>
       </form>
     </div>

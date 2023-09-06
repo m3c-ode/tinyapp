@@ -11,8 +11,22 @@ app.use(cookieParser());
 app.set('view engine', 'ejs');
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {
+    longUrl: "http://www.lighthouselabs.ca",
+    userId: "aJ48lW",
+  },
+  "9sm5xK": {
+    longUrl: "http://www.google.com",
+    userId: "aJ48lW",
+  },
+  b6UTxQ: {
+    longUrl: "https://www.tsn.ca",
+    userId: "test",
+  },
+  i3BoGr: {
+    longUrl: "https://www.google.ca",
+    userId: "test",
+  },
 };
 
 const users = {
@@ -21,8 +35,8 @@ const users = {
     email: "user@example.com",
     password: "purple-monkey-dinosaur",
   },
-  user2RandomID: {
-    id: "user2RandomID",
+  aJ48lW: {
+    id: "aJ48lW",
     email: "user2@example.com",
     password: "dishwasher-funk",
   },
@@ -39,10 +53,40 @@ app.get("/", (req, res) => {
   res.send("Welcome");
 });
 
+//URLS end point
+
 app.get("/urls", (req, res) => {
   const userId = req.cookies["user_id"];
-  res.render("urls-index", { pageTitle: "TinyApp - URLs", urls: urlDatabase, user: users[userId] });
+  console.log("🚀 ~ file: express-server.js:46 ~ app.get ~ userId:", userId);
+  if (!userId) {
+    // Unauthorized
+    // res.set("Content-Type", "text/html");
+    res.status(401);
+    res.send(`<p>Only logged in users can see URLs. Access the login page here: <a href='/login'>Login page</a><p>`);
+  } else {
+    res.render("urls-index", { pageTitle: "TinyApp - URLs", urls: urlDatabase, user: users[userId] });
+  }
   // res.json(urlDatabase);
+});
+app.post("/urls", (req, res) => {
+  const userId = req.cookies["user_id"];
+  if (!userId) {
+    // Unauthorized
+    // res.send("Only logged in users can create new URLs");
+    res.sendStatus(401);
+    // res.redirect("/login");
+  }
+  // urlDatabase
+  let newId = generateRandomString();
+  console.log("🚀 ~ file: express-server.js:43 ~ app.post ~ newId:", newId);
+  let { longUrl } = req.body;
+  urlDatabase[newId] = {
+    longUrl,
+    userId
+  };
+  // .longUrl = longUrl;
+  // urlDatabase[newId].userId = userId;
+  res.redirect(`/urls/${newId}`);
 });
 
 app.get("/urls/new", (req, res) => {
@@ -70,7 +114,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id,
     pageTitle: "TinyApp - Details",
-    longURL: urlDatabase[id],
+    longUrl: urlDatabase[id].longUrl,
     user: users[userId]
   };
   res.render("urls-show", templateVars);
@@ -101,38 +145,24 @@ app.post("/urls/:id", (req, res) => {
   const { id } = req.params;
   const { newUrl } = req.body;
   if (urlDatabase[id]) {
-    urlDatabase[id] = newUrl;
+    urlDatabase[id].longUrl = newUrl;
   }
   res.redirect("/urls");
 });
 
-// Unprotected, everyone can have access
+// Tiny URL redirect - Unprotected, everyone can have access
 app.get("/u/:id", (req, res) => {
   const { id } = req.params;
   if (!urlDatabase[id]) {
     // Not found
+    res.status(404);
     res.send("Can not access. This URL does not exist");
-    res.sendStatus(404);
+    // res.sendStatus(404);
   }
-  res.redirect(urlDatabase[id]);
+  res.redirect(urlDatabase[id].longUrl);
 });
 
-app.post("/urls", (req, res) => {
-  const userId = req.cookies["user_id"];
-  if (!userId) {
-    // Unauthorized
-    // res.send("Only logged in users can create new URLs");
-    res.sendStatus(401);
-    // res.redirect("/login");
-  }
-  // urlDatabase
-  let newId = generateRandomString();
-  console.log("🚀 ~ file: express-server.js:43 ~ app.post ~ newId:", newId);
-  let { longURL } = req.body;
-  urlDatabase[newId] = longURL;
-  res.redirect(`/urls/:${newId}`);
-});
-
+// Authentication - Register and Login endpoints
 app.get("/register", (req, res) => {
   const userId = req.cookies["user_id"];
   if (userId) {
@@ -185,10 +215,6 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/login");
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
 app.listen(PORT, () => {
