@@ -62,7 +62,7 @@ const usersDatabase = {
 
 
 app.get("/", (req, res) => {
-  res.send("Welcome");
+  res.render("index", { pageTitle: "tinyapp - tiny url shortener" });
 });
 
 //URLS end point
@@ -80,7 +80,7 @@ app.get("/urls", (req, res) => {
     res.send(`<p>Only logged in users can see URLs. Access the login page here: <a href='/login'>Login page</a><p>`);
   } else {
     const userUrls = getUserUrls(userId, urlDatabase);
-    res.render("urls-index", { pageTitle: "TinyApp - URLs", urls: userUrls, user: usersDatabase[userId] });
+    res.render("urls-index", { pageTitle: "tinyapp - URLs", urls: userUrls, user: usersDatabase[userId] });
   }
   // res.json(urlDatabase);
 });
@@ -108,7 +108,7 @@ app.get("/urls/new", (req, res) => {
   if (!userId) {
     res.redirect("/login");
   }
-  res.render("urls-new", { user: usersDatabase[userId], pageTitle: "TinyApp - New URL" });
+  res.render("urls-new", { user: usersDatabase[userId], pageTitle: "tinyapp - New URL" });
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -207,7 +207,7 @@ app.get("/register", (req, res) => {
   if (userId) {
     return res.redirect("/urls");
   }
-  res.render("registration", { pageTitle: "TinyApp - Register", user: undefined });
+  res.render("registration", { pageTitle: "tinyapp - Register", user: undefined });
 });
 
 app.post("/register", (req, res) => {
@@ -239,7 +239,7 @@ app.get("/login", (req, res) => {
   if (userId) {
     return res.redirect("/urls");
   }
-  res.render("login", { pageTitle: "TinyApp - Login", user: undefined });
+  res.render("login", { pageTitle: "tinyapp - Login", user: undefined });
 });
 
 app.post("/login", (req, res) => {
