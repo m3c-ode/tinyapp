@@ -107,13 +107,18 @@ app.get("/urls/:id", (req, res) => {
   if (!urlDatabase[id]) {
     // Not found
     // res.send("Can not access. This URL does not exist");
-    res.sendStatus(404);
+    return res.sendStatus(404);
   }
   const userId = req.cookies["user_id"];
   if (!userId) {
     // Unauthorized
-    // res.send("Only logged in users can edit URLs");
-    res.sendStatus(401);
+    res.status(401);
+    return res.send(`<p>Only logged in users can see URLs. Access the login page here: <a href='/login'>Login page</a><p>`);
+  }
+  // Only owners can see their URL - Unauthorized code sent otherwise
+  if (urlDatabase[id].userId !== userId) {
+    res.status(401);
+    return res.send(`<p>This page is for owners<p>`);
   }
   const templateVars = {
     id,
@@ -126,30 +131,50 @@ app.get("/urls/:id", (req, res) => {
   // res.send(req.params);
 });
 
-app.post("/urls/:id/delete", (req, res) => {
-  const userId = req.cookies["user_id"];
-  if (!userId) {
-    // Unauthorized
-    // res.send("Only logged in users can delete URLs");
-    res.sendStatus(401);
-  }
-  const { id } = req.params;
-  if (urlDatabase[id]) {
-    delete urlDatabase[id];
-  }
-  res.redirect("/urls");
-});
 app.post("/urls/:id", (req, res) => {
   const userId = req.cookies["user_id"];
   if (!userId) {
     // Unauthorized
     // res.send("Only logged in users can edit URLs");
-    res.sendStatus(401);
+    return res.sendStatus(401);
   }
   const { id } = req.params;
+  if (!urlDatabase[id]) {
+    return res.sendStatus(404);
+  }
+  // Only owners can edit their URL - Unauthorized code sent otherwise
+  if (urlDatabase[id].userId !== userId) {
+    return res.sendStatus(401);
+  }
   const { newUrl } = req.body;
+  // Can not send an empty string
+  if (!newUrl) {
+    return res.sendStatus(400);
+  }
   if (urlDatabase[id]) {
     urlDatabase[id].longUrl = newUrl;
+  }
+  res.redirect("/urls");
+});
+
+app.post("/urls/:id/delete", (req, res) => {
+  const userId = req.cookies["user_id"];
+  if (!userId) {
+    // Unauthorized
+    // res.send("Only logged in users can delete URLs");
+    return res.sendStatus(401);
+  }
+  const { id } = req.params;
+  // Resource not found
+  if (!urlDatabase[id]) {
+    return res.sendStatus(404);
+  }
+  // Only owners can delete their URL - Unauthorized code sent otherwise
+  if (urlDatabase[id].userId !== userId) {
+    return res.sendStatus(401);
+  }
+  if (urlDatabase[id]) {
+    delete urlDatabase[id];
   }
   res.redirect("/urls");
 });
@@ -160,7 +185,7 @@ app.get("/u/:id", (req, res) => {
   if (!urlDatabase[id]) {
     // Not found
     res.status(404);
-    res.send("Can not access. This URL does not exist");
+    return res.send("Can not access. This URL does not exist");
     // res.sendStatus(404);
   }
   res.redirect(urlDatabase[id].longUrl);
@@ -170,7 +195,7 @@ app.get("/u/:id", (req, res) => {
 app.get("/register", (req, res) => {
   const userId = req.cookies["user_id"];
   if (userId) {
-    res.redirect("/urls");
+    return res.redirect("/urls");
   }
   res.render("registration", { pageTitle: "TinyApp - Register", user: undefined });
 });
@@ -179,12 +204,12 @@ app.post("/register", (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    res.sendStatus(400).send("Bad request - Incomplete form");
+    return res.sendStatus(400).send("Bad request - Incomplete form");
     // res.send("Form was not complete");
   }
   console.log("🚀 ~ file: express-server.js:108 ~ app.post ~ doesExist(email):", doesExist(email));
   if (doesExist(email)) {
-    res.status(400).send("Bad Request - User already exists");
+    return res.status(400).send("Bad Request - User already exists");
   }
   const newUserId = generateRandomString();
   users[newUserId] = {
@@ -201,7 +226,7 @@ app.post("/register", (req, res) => {
 app.get("/login", (req, res) => {
   const userId = req.cookies["user_id"];
   if (userId) {
-    res.redirect("/urls");
+    return res.redirect("/urls");
   }
   res.render("login", { pageTitle: "TinyApp - Login", user: undefined });
 });
@@ -210,7 +235,7 @@ app.post("/login", (req, res) => {
   const { email, password } = req.body;
   const user = findUser(email, password);
   if (!user) {
-    res.sendStatus(403);
+    return res.sendStatus(403);
   }
   res.cookie("user_id", user.id);
   res.redirect("/urls");
