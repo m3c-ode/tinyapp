@@ -1,6 +1,6 @@
 <header>
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
-    <a class="navbar-brand" href="<%= user ? '/urls' : '/login' %>">TinyApp</a>
+    <a class="navbar-brand" href="<%= user ? '/urls' : '/' %>">tinyapp</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
       aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -16,10 +16,6 @@
       <% if (!user) { %>
       <a class="btn btn-outline-dark my-2 my-sm-0 mx-4" href="/register">Register</a>
       <a class="btn btn-outline-dark my-2 my-sm-0" href="/login">Login</a>
-      <!-- <form class="form-inline my-2 my-lg-0" action="/login" method="post">
-        <input class="form-control mr-sm-2" type="text" name="username" placeholder="Username" aria-label="Username">
-        <button class="btn btn-outline-dark my-2 my-sm-0" type="submit">Login</button>
-      </form> -->
       <%} else { %>
       <span class="mx-4">Logged in as: <%= user.email %> &nbsp&nbsp</span>
       <form action="/logout" method="post">
