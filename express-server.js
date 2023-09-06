@@ -1,5 +1,6 @@
 const express = require('express');
 const cookieParser = require("cookie-parser");
+const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080;
 
@@ -49,7 +50,7 @@ const users = {
   test: {
     id: "test",
     email: "test@test.ca",
-    password: "test",
+    password: bcrypt.hashSync("test", 10),
   },
 };
 
@@ -215,7 +216,7 @@ app.post("/register", (req, res) => {
   users[newUserId] = {
     id: newUserId,
     email,
-    password
+    password: bcrypt.hashSync(password, 10)
   };
 
   res.cookie("user_id", newUserId);
@@ -233,10 +234,17 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const user = findUser(email, password);
-  if (!user) {
-    return res.sendStatus(403);
+  // compare with hashed password
+  // const hashedPwd = bcrypt.compareSync(password, hash);
+  const user = findUser(email);
+  if (!user || !bcrypt.compareSync(password, user.password)) {
+    res.status(403);
+    return res.send("Invalid credentials");
+    // return res.sendStatus(403);
   }
+  // if (!user) {
+  // }
+  console.log('users info after afdding new: ', users);
   res.cookie("user_id", user.id);
   res.redirect("/urls");
 });
@@ -260,12 +268,12 @@ const generateRandomString = function() {
   return newId;
 };
 
-// looks up if user already exists in our data
-const findUser = function(email, password) {
+// looks up if user already exists in our data with its email
+const findUser = function(email) {
   for (const user in users) {
     if (Object.hasOwnProperty.call(users, user)) {
       const userObj = users[user];
-      if (userObj.email === email && userObj.password === password) {
+      if (userObj.email === email) {
         return userObj;
       }
     }
