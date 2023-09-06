@@ -56,7 +56,17 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   // console.log('req.params', req.params);
   const { id } = req.params;
+  if (!urlDatabase[id]) {
+    // Not found
+    // res.send("Can not access. This URL does not exist");
+    res.sendStatus(404);
+  }
   const userId = req.cookies["user_id"];
+  if (!userId) {
+    // Unauthorized
+    // res.send("Only logged in users can edit URLs");
+    res.sendStatus(401);
+  }
   const templateVars = {
     id,
     pageTitle: "TinyApp - Details",
@@ -96,6 +106,7 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
+// Unprotected, everyone can have access
 app.get("/u/:id", (req, res) => {
   const { id } = req.params;
   if (!urlDatabase[id]) {
