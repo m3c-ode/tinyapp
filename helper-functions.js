@@ -9,10 +9,13 @@ const generateRandomString = function(length = 6) {
 };
 
 // looks up if user already exists in our data with its email
-const findUser = function(email, database) {
-  for (const user in database) {
-    if (Object.hasOwnProperty.call(database, user)) {
-      const userObj = database[user];
+const findUser = function(email, usersDatabase) {
+  if (!email) {
+    return undefined;
+  }
+  for (const user in usersDatabase) {
+    if (Object.hasOwnProperty.call(usersDatabase, user)) {
+      const userObj = usersDatabase[user];
       if (userObj.email === email) {
         return userObj;
       }
@@ -21,12 +24,13 @@ const findUser = function(email, database) {
   return null;
 };
 // looks up if user already exists in our data
-const doesExist = function(email, database) {
-  for (const user in database) {
-    console.log("🚀 ~ file: express-server.js:168 ~ doesExist ~ user:", user);
-    if (Object.hasOwnProperty.call(database, user)) {
-      const userObj = database[user];
-      console.log("🚀 ~ file: express-server.js:171 ~ doesExist ~ userObj:", userObj);
+const doesExist = function(email, usersDatabase) {
+  if (!email) {
+    return undefined;
+  }
+  for (const user in usersDatabase) {
+    if (Object.hasOwnProperty.call(usersDatabase, user)) {
+      const userObj = usersDatabase[user];
       if (userObj.email === email) {
         return true;
       }
@@ -35,11 +39,11 @@ const doesExist = function(email, database) {
   return false;
 };
 
-const getUserUrls = function(userId, database) {
+const getUserUrls = function(userId, urlDatabase) {
   let userUrls = [];
-  for (const id in database) {
-    if (Object.hasOwnProperty.call(database, id)) {
-      const element = database[id];
+  for (const id in urlDatabase) {
+    if (Object.hasOwnProperty.call(urlDatabase, id)) {
+      const element = urlDatabase[id];
       if (element.userId === userId) {
         userUrls.push({ id, longUrl: element.longUrl });
       }
