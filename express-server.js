@@ -1,6 +1,6 @@
 const express = require('express');
 const cookieSession = require("cookie-session");
-const { generateRandomString } = require("./helper-functions");
+const { generateRandomString, getUserUrls, findUser, doesExist } = require("./helper-functions");
 const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080;
@@ -41,7 +41,7 @@ const urlDatabase = {
 /**
  * @type {Object<string, {id: string, email: string, password: string}}
  */
-const users = {
+const usersDatabase = {
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
@@ -62,7 +62,7 @@ const users = {
 
 
 app.get("/", (req, res) => {
-  res.send("Welcome");
+  res.render("index", { pageTitle: "tinyapp - tiny url shortener" });
 });
 
 //URLS end point
@@ -79,8 +79,8 @@ app.get("/urls", (req, res) => {
     res.status(401);
     res.send(`<p>Only logged in users can see URLs. Access the login page here: <a href='/login'>Login page</a><p>`);
   } else {
-    const userUrls = getUserUrls(userId);
-    res.render("urls-index", { pageTitle: "TinyApp - URLs", urls: userUrls, user: users[userId] });
+    const userUrls = getUserUrls(userId, urlDatabase);
+    res.render("urls-index", { pageTitle: "tinyapp - URLs", urls: userUrls, user: usersDatabase[userId] });
   }
   // res.json(urlDatabase);
 });
@@ -108,7 +108,7 @@ app.get("/urls/new", (req, res) => {
   if (!userId) {
     res.redirect("/login");
   }
-  res.render("urls-new", { user: users[userId], pageTitle: "TinyApp - New URL" });
+  res.render("urls-new", { user: usersDatabase[userId], pageTitle: "tinyapp - New URL" });
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -134,7 +134,7 @@ app.get("/urls/:id", (req, res) => {
     id,
     pageTitle: "TinyApp - Details",
     longUrl: urlDatabase[id].longUrl,
-    user: users[userId]
+    user: usersDatabase[userId]
   };
   res.render("urls-show", templateVars);
   // res.json(urlDatabase);
@@ -207,7 +207,7 @@ app.get("/register", (req, res) => {
   if (userId) {
     return res.redirect("/urls");
   }
-  res.render("registration", { pageTitle: "TinyApp - Register", user: undefined });
+  res.render("registration", { pageTitle: "tinyapp - Register", user: undefined });
 });
 
 app.post("/register", (req, res) => {
@@ -217,12 +217,12 @@ app.post("/register", (req, res) => {
     return res.sendStatus(400).send("Bad request - Incomplete form");
     // res.send("Form was not complete");
   }
-  console.log("🚀 ~ file: express-server.js:108 ~ app.post ~ doesExist(email):", doesExist(email));
-  if (doesExist(email)) {
+  // console.log("🚀 ~ file: express-server.js:108 ~ app.post ~ doesExist(email):", doesExist(email, usersDatabase));
+  if (doesExist(email, usersDatabase)) {
     return res.status(400).send("Bad Request - User already exists");
   }
   const newUserId = generateRandomString();
-  users[newUserId] = {
+  usersDatabase[newUserId] = {
     id: newUserId,
     email,
     password: bcrypt.hashSync(password, 10)
@@ -230,7 +230,7 @@ app.post("/register", (req, res) => {
 
   req.session.userId = newUserId;
   // res.cookie("user_id", newUserId);
-  console.log('users list', users);
+  console.log('users list', usersDatabase);
   res.redirect("/urls");
 });
 
@@ -239,14 +239,14 @@ app.get("/login", (req, res) => {
   if (userId) {
     return res.redirect("/urls");
   }
-  res.render("login", { pageTitle: "TinyApp - Login", user: undefined });
+  res.render("login", { pageTitle: "tinyapp - Login", user: undefined });
 });
 
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   // compare with hashed password
   // const hashedPwd = bcrypt.compareSync(password, hash);
-  const user = findUser(email);
+  const user = findUser(email, usersDatabase);
   if (!user || !bcrypt.compareSync(password, user.password)) {
     res.status(403);
     return res.send("Invalid credentials");
@@ -254,7 +254,7 @@ app.post("/login", (req, res) => {
   }
   // if (!user) {
   // }
-  console.log('users info after afdding new: ', users);
+  console.log('users info after adding new: ', usersDatabase);
   req.session.userId = user.id;
   // res.cookie("user_id", user.id);
   res.redirect("/urls");
@@ -268,43 +268,3 @@ app.post("/logout", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
-
-// looks up if user already exists in our data with its email
-const findUser = function(email) {
-  for (const user in users) {
-    if (Object.hasOwnProperty.call(users, user)) {
-      const userObj = users[user];
-      if (userObj.email === email) {
-        return userObj;
-      }
-    }
-  }
-  return null;
-};
-// looks up if user already exists in our data
-const doesExist = function(email) {
-  for (const user in users) {
-    console.log("🚀 ~ file: express-server.js:168 ~ doesExist ~ user:", user);
-    if (Object.hasOwnProperty.call(users, user)) {
-      const userObj = users[user];
-      console.log("🚀 ~ file: express-server.js:171 ~ doesExist ~ userObj:", userObj);
-      if (userObj.email === email) {
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
-const getUserUrls = function(userId) {
-  let userUrls = [];
-  for (const id in urlDatabase) {
-    if (Object.hasOwnProperty.call(urlDatabase, id)) {
-      const element = urlDatabase[id];
-      if (element.userId === userId) {
-        userUrls.push({ id, longUrl: element.longUrl });
-      }
-    }
-  }
-  return userUrls;
-};
