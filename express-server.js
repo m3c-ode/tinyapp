@@ -10,6 +10,9 @@ app.use(cookieParser());
 
 app.set('view engine', 'ejs');
 
+/**
+ * @type {{[key: string]: {longUrl: string, userId: string}}}
+ */
 const urlDatabase = {
   "b2xVn2": {
     longUrl: "http://www.lighthouselabs.ca",
@@ -29,6 +32,9 @@ const urlDatabase = {
   },
 };
 
+/**
+ * @type {Object<string, {id: string, email: string, password: string}}
+ */
 const users = {
   userRandomID: {
     id: "userRandomID",
@@ -57,14 +63,14 @@ app.get("/", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const userId = req.cookies["user_id"];
-  console.log("🚀 ~ file: express-server.js:46 ~ app.get ~ userId:", userId);
   if (!userId) {
     // Unauthorized
     // res.set("Content-Type", "text/html");
     res.status(401);
     res.send(`<p>Only logged in users can see URLs. Access the login page here: <a href='/login'>Login page</a><p>`);
   } else {
-    res.render("urls-index", { pageTitle: "TinyApp - URLs", urls: urlDatabase, user: users[userId] });
+    const userUrls = getUserUrls(userId);
+    res.render("urls-index", { pageTitle: "TinyApp - URLs", urls: userUrls, user: users[userId] });
   }
   // res.json(urlDatabase);
 });
@@ -84,8 +90,6 @@ app.post("/urls", (req, res) => {
     longUrl,
     userId
   };
-  // .longUrl = longUrl;
-  // urlDatabase[newId].userId = userId;
   res.redirect(`/urls/${newId}`);
 });
 
@@ -256,4 +260,17 @@ const doesExist = function(email) {
     }
   }
   return false;
+};
+
+const getUserUrls = function(userId) {
+  let userUrls = [];
+  for (const id in urlDatabase) {
+    if (Object.hasOwnProperty.call(urlDatabase, id)) {
+      const element = urlDatabase[id];
+      if (element.userId === userId) {
+        userUrls.push({ id, longUrl: element.longUrl });
+      }
+    }
+  }
+  return userUrls;
 };

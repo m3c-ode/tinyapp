@@ -14,13 +14,13 @@
         </tr>
       </thead>
       <tbody>
-        <% for (let id in urls) { %>
+        <% for (let url of urls) { %>
         <tr>
-          <td><a href="/urls/<%= id %>"><%= id %></a></td>
-          <td><%= urls[id].longUrl %></td>
-          <td><a class="btn btn-outline-primary" href="/urls/<%= id %>">Edit</a></td>
+          <td><a href="/urls/<%= url.id %>"><%= url.id %></a></td>
+          <td><%= url.longUrl %></td>
+          <td><a class="btn btn-outline-primary" href="/urls/<%= url.id %>">Edit</a></td>
           <td>
-            <form action="/urls/<%= id %>/delete" method="post"><button class="btn btn-outline-danger"
+            <form action="/urls/<%= url.id %>/delete" method="post"><button class="btn btn-outline-danger"
                 type="submit">Delete</button> </form>
           </td>
         </tr>
