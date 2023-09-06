@@ -1,5 +1,6 @@
 const express = require('express');
-const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
+const { generateRandomString } = require("./helper-functions");
 const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080;
@@ -7,7 +8,11 @@ const PORT = 8080;
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: [generateRandomString(10)],
+  maxAge: 12 * 60 * 60 * 1000
+}));
 
 app.set('view engine', 'ejs');
 
@@ -63,7 +68,11 @@ app.get("/", (req, res) => {
 //URLS end point
 
 app.get("/urls", (req, res) => {
-  const userId = req.cookies["user_id"];
+
+  //From cookie-parser to cookieSession
+  // const userId = req.cookies["user_id"];
+  const userId = req.session.userId;
+
   if (!userId) {
     // Unauthorized
     // res.set("Content-Type", "text/html");
@@ -76,7 +85,7 @@ app.get("/urls", (req, res) => {
   // res.json(urlDatabase);
 });
 app.post("/urls", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.userId;
   if (!userId) {
     // Unauthorized
     // res.send("Only logged in users can create new URLs");
@@ -95,7 +104,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.userId;
   if (!userId) {
     res.redirect("/login");
   }
@@ -110,7 +119,7 @@ app.get("/urls/:id", (req, res) => {
     // res.send("Can not access. This URL does not exist");
     return res.sendStatus(404);
   }
-  const userId = req.cookies["user_id"];
+  const userId = req.session.userId;
   if (!userId) {
     // Unauthorized
     res.status(401);
@@ -133,7 +142,7 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.userId;
   if (!userId) {
     // Unauthorized
     // res.send("Only logged in users can edit URLs");
@@ -159,7 +168,7 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.userId;
   if (!userId) {
     // Unauthorized
     // res.send("Only logged in users can delete URLs");
@@ -194,7 +203,7 @@ app.get("/u/:id", (req, res) => {
 
 // Authentication - Register and Login endpoints
 app.get("/register", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.userId;
   if (userId) {
     return res.redirect("/urls");
   }
@@ -219,13 +228,14 @@ app.post("/register", (req, res) => {
     password: bcrypt.hashSync(password, 10)
   };
 
-  res.cookie("user_id", newUserId);
+  req.session.userId = newUserId;
+  // res.cookie("user_id", newUserId);
   console.log('users list', users);
   res.redirect("/urls");
 });
 
 app.get("/login", (req, res) => {
-  const userId = req.cookies["user_id"];
+  const userId = req.session.userId;
   if (userId) {
     return res.redirect("/urls");
   }
@@ -245,7 +255,8 @@ app.post("/login", (req, res) => {
   // if (!user) {
   // }
   console.log('users info after afdding new: ', users);
-  res.cookie("user_id", user.id);
+  req.session.userId = user.id;
+  // res.cookie("user_id", user.id);
   res.redirect("/urls");
 });
 
@@ -257,16 +268,6 @@ app.post("/logout", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
-
-const generateRandomString = function() {
-  let newId = '';
-  const set = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (let index = 0; index < 6; index++) {
-    let randomIndex = Math.floor(Math.random() * set.length);
-    newId += set[randomIndex];
-  }
-  return newId;
-};
 
 // looks up if user already exists in our data with its email
 const findUser = function(email) {
