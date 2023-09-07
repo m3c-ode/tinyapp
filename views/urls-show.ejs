@@ -12,7 +12,7 @@
     </div>
     <div class="card-footer text-muted">
       <h4>Edit</h4>
-      <form action="/urls/<%= id %>" method="post">
+      <form action="/urls/<%= id %>?_method=PUT" method="post">
         <label for="newUrl">New URL: </label>
         <input type="text" name="newUrl" id="" placeholder="<%= longUrl %>">
         <button class="btn btn-primary" type="submit">Submit</button>

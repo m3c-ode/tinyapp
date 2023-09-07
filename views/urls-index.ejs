@@ -20,7 +20,7 @@
           <td><%= url.longUrl %></td>
           <td><a class="btn btn-outline-primary" href="/urls/<%= url.id %>">Edit</a></td>
           <td>
-            <form action="/urls/<%= url.id %>/delete" method="post"><button class="btn btn-outline-danger"
+            <form action="/urls/<%= url.id %>?_method=DELETE" method="post"><button class="btn btn-outline-danger"
                 type="submit">Delete</button> </form>
           </td>
         </tr>

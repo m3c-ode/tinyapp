@@ -2,6 +2,7 @@ const express = require('express');
 const cookieSession = require("cookie-session");
 const { generateRandomString, getUserUrls, findUser, doesExist } = require("./helper-functions");
 const bcrypt = require('bcryptjs');
+const methodOverride = require('method-override');
 const app = express();
 const PORT = 8080;
 
@@ -13,6 +14,7 @@ app.use(cookieSession({
   keys: [generateRandomString(10)],
   maxAge: 12 * 60 * 60 * 1000
 }));
+app.use(methodOverride('_method'));
 
 app.set('view engine', 'ejs');
 
@@ -77,7 +79,7 @@ app.get("/urls", (req, res) => {
     // Unauthorized
     // res.set("Content-Type", "text/html");
     res.status(401);
-    res.send(`<p>Only logged in users can see URLs. Access the login page here: <a href='/login'>Login page</a><p>`);
+    return res.send(`<p>Only logged in users can see URLs. Access the login page here: <a href='/login'>Login page</a><p>`);
   } else {
     const userUrls = getUserUrls(userId, urlDatabase);
     res.render("urls-index", { pageTitle: "tinyapp - URLs", urls: userUrls, user: usersDatabase[userId] });
@@ -89,12 +91,11 @@ app.post("/urls", (req, res) => {
   if (!userId) {
     // Unauthorized
     // res.send("Only logged in users can create new URLs");
-    res.sendStatus(401);
+    return res.sendStatus(401);
     // res.redirect("/login");
   }
   // urlDatabase
   let newId = generateRandomString();
-  console.log("🚀 ~ file: express-server.js:43 ~ app.post ~ newId:", newId);
   let { longUrl } = req.body;
   urlDatabase[newId] = {
     longUrl,
@@ -106,7 +107,7 @@ app.post("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const userId = req.session.userId;
   if (!userId) {
-    res.redirect("/login");
+    return res.redirect("/login");
   }
   res.render("urls-new", { user: usersDatabase[userId], pageTitle: "tinyapp - New URL" });
 });
@@ -141,7 +142,7 @@ app.get("/urls/:id", (req, res) => {
   // res.send(req.params);
 });
 
-app.post("/urls/:id", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   const userId = req.session.userId;
   if (!userId) {
     // Unauthorized
@@ -167,7 +168,7 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id", (req, res) => {
   const userId = req.session.userId;
   if (!userId) {
     // Unauthorized
@@ -217,7 +218,6 @@ app.post("/register", (req, res) => {
     return res.sendStatus(400).send("Bad request - Incomplete form");
     // res.send("Form was not complete");
   }
-  // console.log("🚀 ~ file: express-server.js:108 ~ app.post ~ doesExist(email):", doesExist(email, usersDatabase));
   if (doesExist(email, usersDatabase)) {
     return res.status(400).send("Bad Request - User already exists");
   }
@@ -229,8 +229,6 @@ app.post("/register", (req, res) => {
   };
 
   req.session.userId = newUserId;
-  // res.cookie("user_id", newUserId);
-  console.log('users list', usersDatabase);
   res.redirect("/urls");
 });
 
@@ -252,16 +250,13 @@ app.post("/login", (req, res) => {
     return res.send("Invalid credentials");
     // return res.sendStatus(403);
   }
-  // if (!user) {
-  // }
-  console.log('users info after adding new: ', usersDatabase);
   req.session.userId = user.id;
-  // res.cookie("user_id", user.id);
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null;
+  res.clearCookie("userId");
   res.redirect("/login");
 });
 

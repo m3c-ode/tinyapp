@@ -1,7 +1,7 @@
 # tinyapp - a URL tinying web app
 *tiny url clone*
 
-TinyApp is a simple URL shortening web application built with Express.js and EJS templating. It allows users to create short aliases for long URLs, making them easier to share and manage.
+**tinyapp** is a simple URL shortening web application built with Express.js and EJS templating. It allows users to create short aliases for long URLs, making them easier to share and manage.
 
 ## Final Product
 !["URLs page"](https://github.com/m3c-ode/tinyapp/blob/main/docs/urls-page.png)
