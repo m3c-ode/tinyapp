@@ -19,32 +19,37 @@ app.use(methodOverride('_method'));
 app.set('view engine', 'ejs');
 
 /**
- * @type {{[key: string]: {longUrl: string, userId: string, count: number, uniqueVisitors: {timestamp: Date, id: string}[]}}}
+ * @type {{[key: string]: {longUrl: string, userId: string, count: number, uniqueVisitors: string[], allVisits: {visitorId: string, timestamp: Date}[]}}}
  */
 const urlDatabase = {
   "b2xVn2": {
     longUrl: "http://www.lighthouselabs.ca",
     userId: "aJ48lW",
     count: 0,
-    uniqueVisitors: []
+    uniqueVisitors: [],
+    allVisits: []
   },
   "9sm5xK": {
     longUrl: "http://www.google.com",
     userId: "aJ48lW",
     count: 0,
-    uniqueVisitors: []
+    uniqueVisitors: [],
+    allVisits: []
+
   },
   b6UTxQ: {
     longUrl: "https://www.tsn.ca",
     userId: "test",
     count: 0,
-    uniqueVisitors: []
+    uniqueVisitors: [],
+    allVisits: []
   },
   i3BoGr: {
     longUrl: "https://www.google.ca",
     userId: "test",
     count: 0,
-    uniqueVisitors: []
+    uniqueVisitors: [],
+    allVisits: []
   },
 };
 
@@ -109,7 +114,8 @@ app.post("/urls", (req, res) => {
     longUrl,
     userId,
     count: 0,
-    uniqueVisitors: []
+    uniqueVisitors: [],
+    allVisits: []
   };
   res.redirect(`/urls/${newId}`);
 });
@@ -146,8 +152,9 @@ app.get("/urls/:id", (req, res) => {
     pageTitle: "TinyApp - Details",
     longUrl: urlDatabase[id].longUrl,
     user: usersDatabase[userId],
-    count: urlDatabase[id].count ? urlDatabase[id].count : 0,
-    uniqueVisitors: urlDatabase[id].uniqueVisitors.length ? urlDatabase[id].uniqueVisitors.length : 0,
+    count: urlDatabase[id].count,
+    uniqueVisitors: urlDatabase[id].uniqueVisitors.length,
+    allVisits: urlDatabase[id].allVisits
   };
   res.render("urls-show", templateVars);
   // res.json(urlDatabase);
@@ -217,9 +224,16 @@ app.get("/u/:id", (req, res) => {
   } else {
     urlDatabase[id].count++;
   }
-  if (!urlDatabase[id].uniqueVisitors.includes(userId)) {
-    urlDatabase[id].uniqueVisitors.push(userId);
+  const visitorId = userId || generateRandomString(6);
+  let visit = {
+    visitorId,
+    timestamp: Date.now()
+  };
+  // Add unique visitors that are logged in.
+  if (!urlDatabase[id].uniqueVisitors.includes(visitorId)) {
+    urlDatabase[id].uniqueVisitors.push(visitorId);
   }
+  urlDatabase[id].allVisits.push(visit);
 
   res.redirect(urlDatabase[id].longUrl);
 });
