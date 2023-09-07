@@ -6,7 +6,7 @@
 ## Final Product
 !["URLs page"](https://github.com/m3c-ode/tinyapp/blob/main/docs/urls-page.png)
 !["Create new URL page"](https://github.com/m3c-ode/tinyapp/blob/main/docs/urls-create.png)
-!["Edit URL page"](https://github.com/m3c-ode/tinyapp/blob/main/docs/urls-edit.png)
+!["Edit URL page"](https://github.com/m3c-ode/tinyapp/blob/main/docs/urls-edit1.png)
 
 ## Features
 
