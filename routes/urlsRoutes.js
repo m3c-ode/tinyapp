@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 // const packageName = require('packageName');
 const { urlDatabase, usersDatabase } = require("../database");
-const { generateRandomString, getUserUrls, findUser, doesExist } = require("../helper-functions");
+const { generateRandomString, getUserUrls } = require("../helper-functions");
 
 
 // replace all the app. routes with router. routes from the app, in this file

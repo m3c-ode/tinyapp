@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+
 const generateRandomString = function(length = 6) {
   let newId = '';
   const set = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -121,7 +122,5 @@ module.exports = {
   addNewUserToDb,
   generateRandomString,
   getUserUrls,
-  findUser,
-  doesExist,
   getCurrentUserMiddleware
 };
