@@ -93,6 +93,7 @@ const addCountVisitToUrl = function(id, urlDatabase) {
 };
 
 const addVisitInformation = function(userId, urlId, urlDatabase) {
+  // user userId in cookie if logged in user otherwise generatew new visitorId
   const visitorId = userId || generateRandomString(6);
   let visit = {
     visitorId,
