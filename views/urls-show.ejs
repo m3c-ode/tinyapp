@@ -7,7 +7,7 @@
     <div class="card-header">
       <h5 class="card-title">TinyURL for: <%= longUrl %></h5>
       <p class="card-text">
-        Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
+        Short URL ID and link: <a href="/u/<%= id %>"><%= id %></a>
       </p>
       <p class="card-text">
         Visited <strong><%= count %></strong> <%= count > 1 ? "times" : "time" %>
@@ -16,8 +16,16 @@
         By <strong><%= uniqueVisitors %></strong> unique <%= uniqueVisitors > 1 ? "visitors" : "visitor" %>
       </p>
     </div>
-    <div class="card-body m-auto" style="width: 85%;">
-      <table class="table tabel-striped table-sm ">
+    <div class="card-body my-3">
+      <h4>Edit</h4>
+      <form action="/urls/<%= id %>?_method=PUT" method="post">
+        <label for="newUrl">New URL: </label>
+        <input type="text" name="newUrl" id="" placeholder="<%= longUrl %>" value="<%= longUrl %>">
+        <button class="btn btn-primary" type="submit">Submit</button>
+      </form>
+    </div>
+    <div class="card-footer text-muted">
+      <table class="table tabel-striped table-sm m-auto" style="width: 85%;">
         <h3>Analytics</h3>
         <thead>
           <tr>
@@ -30,7 +38,7 @@
           <% for (let [index, visit] of allVisits.entries()) { %>
           <tr>
             <td><%= index %></td>
-            <td><%= visit.visitorId %></td>
+            <td><%= visit.visitorId + (visit.visitorId === user.id ? " (you)" : "") %></td>
             <td>
               <%= new Date(visit.timestamp).toLocaleDateString(undefined,{ year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' } ) %>
             </td>
@@ -38,15 +46,6 @@
           <% } %>
         </tbody>
       </table>
-      <!-- <div class="card-body">Hello</div> -->
-    </div>
-    <div class="card-footer text-muted">
-      <h4>Edit</h4>
-      <form action="/urls/<%= id %>?_method=PUT" method="post">
-        <label for="newUrl">New URL: </label>
-        <input type="text" name="newUrl" id="" placeholder="<%= longUrl %>">
-        <button class="btn btn-primary" type="submit">Submit</button>
-      </form>
     </div>
   </div>
   <%- include('partials/_bootstrap-scripts') %>

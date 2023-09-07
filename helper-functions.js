@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const generateRandomString = function(length = 6) {
   let newId = '';
   const set = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -52,5 +53,75 @@ const getUserUrls = function(userId, urlDatabase) {
   return userUrls;
 };
 
+// Create an authenticateUser function(email, password)
+//find user then compare passwords
 
-module.exports = { generateRandomString, getUserUrls, findUser, doesExist };
+// addNEwUSer(name, email, pasword)
+const addNewUserToDb = function(email, password, usersDatabase) {
+  if (doesExist(email, usersDatabase)) {
+    return false;
+  }
+  const newUserId = generateRandomString();
+  usersDatabase[newUserId] = {
+    id: newUserId,
+    email,
+    password: bcrypt.hashSync(password, 10)
+  };
+  return usersDatabase[newUserId];
+};
+
+const verifyUser = function(email, password, usersDatabase) {
+  const user = findUser(email, usersDatabase);
+  if (!user || !bcrypt.compareSync(password, user.password)) {
+    return null;
+  }
+  return user;
+};
+
+
+// Create a regular function to become a middleware, toretired loggedinUser and assign cookies
+// getCurrentUSer (req, res, next)
+const getCurrentUserMiddleware = function(database, req, res, next) {
+  const { userId } = req.session;
+  const user = database[userId];
+  req.user = user;
+  next();
+};
+
+// Refactor routes
+
+const addCountVisitToUrl = function(id, urlDatabase) {
+  if (!urlDatabase[id].count) {
+    urlDatabase[id].count = 1;
+  } else {
+    urlDatabase[id].count++;
+  }
+};
+
+const addVisitInformation = function(userId, urlId, urlDatabase) {
+  const visitorId = userId || generateRandomString(6);
+  let visit = {
+    visitorId,
+    timestamp: Date.now()
+  };
+  // Add unique visitors that are logged in.
+  if (!urlDatabase[urlId].uniqueVisitors.includes(visitorId)) {
+    urlDatabase[urlId].uniqueVisitors.push(visitorId);
+  }
+  // Add visit details to DB
+  urlDatabase[urlId].allVisits.push(visit);
+};
+
+
+
+module.exports = {
+  addVisitInformation,
+  addCountVisitToUrl,
+  verifyUser,
+  addNewUserToDb,
+  generateRandomString,
+  getUserUrls,
+  findUser,
+  doesExist,
+  getCurrentUserMiddleware
+};
