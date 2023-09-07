@@ -3,6 +3,11 @@
 
 TinyApp is a simple URL shortening web application built with Express.js and EJS templating. It allows users to create short aliases for long URLs, making them easier to share and manage.
 
+## Final Product
+!["URLs page"](https://github.com/m3c-ode/tinyapp/blob/main/docs/urls-page.png)
+!["Create new URL page"](https://github.com/m3c-ode/tinyapp/blob/main/docs/urls-create.png)
+!["Edit URL page"](https://github.com/m3c-ode/tinyapp/blob/main/docs/urls-edit.png)
+
 ## Features
 
 - User Registration and Login
