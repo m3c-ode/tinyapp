@@ -23,17 +23,13 @@ router.get("/", (req, res) => {
     const userUrls = getUserUrls(userId, urlDatabase);
     res.render("urls-index", { pageTitle: "tinyapp - URLs", urls: userUrls, user: usersDatabase[userId] });
   }
-  // res.json(urlDatabase);
 });
 router.post("/", (req, res) => {
   const userId = req.session.userId;
   if (!userId) {
     // Unauthorized
-    // res.send("Only logged in users can create new URLs");
     return res.sendStatus(401);
-    // res.redirect("/login");
   }
-  // urlDatabase
   let newId = generateRandomString();
   let { longUrl } = req.body;
   urlDatabase[newId] = {
@@ -55,12 +51,11 @@ router.get("/new", (req, res) => {
 });
 
 router.get("/:id", (req, res) => {
-  // console.log('req.params', req.params);
   const { id } = req.params;
   if (!urlDatabase[id]) {
     // Not found
-    // res.send("Can not access. This URL does not exist");
-    return res.sendStatus(404);
+    res.status(404);
+    return res.send("Can not access. This URL does not exist");
   }
   const userId = req.session.userId;
   if (!userId) {
@@ -83,15 +78,12 @@ router.get("/:id", (req, res) => {
     allVisits: urlDatabase[id].allVisits
   };
   res.render("urls-show", templateVars);
-  // res.json(urlDatabase);
-  // res.send(req.params);
 });
 
 router.put("/:id", (req, res) => {
   const userId = req.session.userId;
   if (!userId) {
     // Unauthorized
-    // res.send("Only logged in users can edit URLs");
     return res.sendStatus(401);
   }
   const { id } = req.params;
@@ -118,7 +110,6 @@ router.delete("/:id", (req, res) => {
   const userId = req.session.userId;
   if (!userId) {
     // Unauthorized
-    // res.send("Only logged in users can delete URLs");
     return res.sendStatus(401);
   }
   const { id } = req.params;
@@ -136,7 +127,5 @@ router.delete("/:id", (req, res) => {
   // Relative to root of host name
   res.redirect("/urls");
 });
-
-// import in main server file as a middleware: app.use(urlsRouter)
 
 module.exports = router;

@@ -25,6 +25,7 @@ const findUser = function(email, usersDatabase) {
   }
   return null;
 };
+
 // looks up if user already exists in our data
 const doesExist = function(email, usersDatabase) {
   if (!email) {
@@ -54,10 +55,6 @@ const getUserUrls = function(userId, urlDatabase) {
   return userUrls;
 };
 
-// Create an authenticateUser function(email, password)
-//find user then compare passwords
-
-// addNEwUSer(name, email, pasword)
 const addNewUserToDb = function(email, password, usersDatabase) {
   if (doesExist(email, usersDatabase)) {
     return false;
@@ -80,16 +77,12 @@ const verifyUser = function(email, password, usersDatabase) {
 };
 
 
-// Create a regular function to become a middleware, toretired loggedinUser and assign cookies
-// getCurrentUSer (req, res, next)
 const getCurrentUserMiddleware = function(database, req, res, next) {
   const { userId } = req.session;
   const user = database[userId];
   req.user = user;
   next();
 };
-
-// Refactor routes
 
 const addCountVisitToUrl = function(id, urlDatabase) {
   if (!urlDatabase[id].count) {

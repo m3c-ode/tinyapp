@@ -41,7 +41,6 @@ app.get("/u/:id", (req, res) => {
     // Not found
     res.status(404);
     return res.send("This URL can not be found");
-    // res.sendStatus(404);
   }
 
   addCountVisitToUrl(id, urlDatabase);
