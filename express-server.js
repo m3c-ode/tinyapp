@@ -135,7 +135,8 @@ app.get("/urls/:id", (req, res) => {
     id,
     pageTitle: "TinyApp - Details",
     longUrl: urlDatabase[id].longUrl,
-    user: usersDatabase[userId]
+    user: usersDatabase[userId],
+    count: urlDatabase[id].count ? urlDatabase[id].count : 0
   };
   res.render("urls-show", templateVars);
   // res.json(urlDatabase);
@@ -199,6 +200,12 @@ app.get("/u/:id", (req, res) => {
     return res.send("Can not access. This URL does not exist");
     // res.sendStatus(404);
   }
+  if (!urlDatabase[id].count) {
+    urlDatabase[id].count = 1;
+  } else {
+    urlDatabase[id].count++;
+  }
+
   res.redirect(urlDatabase[id].longUrl);
 });
 
