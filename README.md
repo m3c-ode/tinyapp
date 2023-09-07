@@ -10,27 +10,35 @@ TinyApp is a simple URL shortening web application built with Express.js and EJS
 - URL Shortening and Management for Users
 - User-Friendly (Very simple...) Interface
 - Route protection
+- Tests for helper functions using Mocha and Chai
 
 ## Getting started
 To use this app, you will need:
 - Node.js installed (version 12 or higher)
 - npm (Node Package Manager) installed
 
-  1. Clone this repository and move into the folder:
+1. Clone this repository and move into the folder:
     ```bash
     git clone https://github.com/yourusername/tinyapp.git
     cd tinyapp
     ```
 
-  2. Install dependencies:
+2. Install dependencies:
+    ```
+    npm install
+    ```
 
-      ```npm install```
+3. Start the application: 
+    ```
+    npm start
+    ```
 
-  3. Start the application: 
+4. Open your web browser and navigate to http://localhost:8080 to start acccessing TinyApp.
 
-      ```npm start```
-
-  4. Open your web browser and navigate to http://localhost:8080 to start acccessing TinyApp.
+5. Accessorily, you can run some unit testing done (in `/test` folder)
+    ```
+    npm mocha
+    ```
 
 
 ## Using this app
@@ -44,6 +52,7 @@ A user can:
 - EJS: A simple templating engine for generating HTML templates.
 - bcryptjs: Library for hashing and comparing passwords securely.
 - cookie-session: Middleware for handling session data using cookies.
+- Mocha and Chai for unit testing
 
 ## Project Structure
 - express-server.js: The main server file containing application routes and configuration.
