@@ -19,24 +19,32 @@ app.use(methodOverride('_method'));
 app.set('view engine', 'ejs');
 
 /**
- * @type {{[key: string]: {longUrl: string, userId: string}}}
+ * @type {{[key: string]: {longUrl: string, userId: string, count: number, uniqueVisitors: {timestamp: Date, id: string}[]}}}
  */
 const urlDatabase = {
   "b2xVn2": {
     longUrl: "http://www.lighthouselabs.ca",
     userId: "aJ48lW",
+    count: 0,
+    uniqueVisitors: []
   },
   "9sm5xK": {
     longUrl: "http://www.google.com",
     userId: "aJ48lW",
+    count: 0,
+    uniqueVisitors: []
   },
   b6UTxQ: {
     longUrl: "https://www.tsn.ca",
     userId: "test",
+    count: 0,
+    uniqueVisitors: []
   },
   i3BoGr: {
     longUrl: "https://www.google.ca",
     userId: "test",
+    count: 0,
+    uniqueVisitors: []
   },
 };
 
@@ -99,7 +107,9 @@ app.post("/urls", (req, res) => {
   let { longUrl } = req.body;
   urlDatabase[newId] = {
     longUrl,
-    userId
+    userId,
+    count: 0,
+    uniqueVisitors: []
   };
   res.redirect(`/urls/${newId}`);
 });
@@ -136,7 +146,8 @@ app.get("/urls/:id", (req, res) => {
     pageTitle: "TinyApp - Details",
     longUrl: urlDatabase[id].longUrl,
     user: usersDatabase[userId],
-    count: urlDatabase[id].count ? urlDatabase[id].count : 0
+    count: urlDatabase[id].count ? urlDatabase[id].count : 0,
+    uniqueVisitors: urlDatabase[id].uniqueVisitors.length ? urlDatabase[id].uniqueVisitors.length : 0,
   };
   res.render("urls-show", templateVars);
   // res.json(urlDatabase);
@@ -193,6 +204,7 @@ app.delete("/urls/:id", (req, res) => {
 
 // Tiny URL redirect - Unprotected, everyone can have access
 app.get("/u/:id", (req, res) => {
+  const { userId } = req.session;
   const { id } = req.params;
   if (!urlDatabase[id]) {
     // Not found
@@ -204,6 +216,9 @@ app.get("/u/:id", (req, res) => {
     urlDatabase[id].count = 1;
   } else {
     urlDatabase[id].count++;
+  }
+  if (!urlDatabase[id].uniqueVisitors.includes(userId)) {
+    urlDatabase[id].uniqueVisitors.push(userId);
   }
 
   res.redirect(urlDatabase[id].longUrl);
